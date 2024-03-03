@@ -1,0 +1,16 @@
+########## Criando um ambiente virtual ##########
+
+python -m venv .venv
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+.\.venv\Scripts\activate
+
+deactivate
+
+########## Criando um arquivo de dependências do projeto ##########
+
+pip freeze > requirements.txt
+
+-------------------------------------------------------------------------
+

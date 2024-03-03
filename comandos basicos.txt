@@ -1,0 +1,270 @@
+########## Criando um ambiente virtual ##########
+
+python -m venv .venv
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+.\.venv\Scripts\activate
+
+deactivate
+
+########## Criando um arquivo de dependências do projeto ##########
+
+pip freeze > requirements.txt
+
+-------------------------------------------------------------------------
+
+########## instalando o Framework Django ##########
+
+pip install Django
+
+obs: o comando django-admin help, mostra todos os comandos do django para nos auxiliar nos projetos.
+
+-------------------------------------------------------------------------
+
+########## Iniciando um projeto Django ##########
+
+django-admin startproject setup .
+
+Comando para rodar o servidor: python manage.py runserver
+
+Após iniciar o servidor através da url do localhost na porta 8000 (http://127.0.0.1:8000)
+
+Você pode acessar a página do servidor do Django.
+
+Para alterar o idioma e UTC no servidor basta ir ao arquivo settings do seu projeto e alterar os seguintes campos:
+
+LANGUAGE_CODE = 'pt-br'
+
+TIME_ZONE = 'America/Sao_Paulo'
+
+-------------------------------------------------------------------------
+
+########## Configurando as variaveis de ambiente no Django ##########
+
+pip install python-dotenv
+
+com esse pacote criaremos um arquivo com as variaveis de ambiente com informações sigilosas que
+
+não podem ser expostas no github por exemplo por questões de segurança.
+
+com isso na pasta raíz do nosso projeto criaremos um arquivo chamado ".env" que receberão esses dados
+
+e através de um gitignore conseguimos garantir a segurança desses dados.
+
+uma configuração é necessaria nos arquivos que realizarão a consulta no arquivo ".env":
+
+Importar os pacotes os e dotenv e executar a carga das variaveis de ambiente.
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+exemplo de chamada das variaveis: SECRET_KEY = os.getenv('SECRET_KEY')
+
+-------------------------------------------------------------------------
+
+########## Configurando osarquivos do Django que enviaremos para os repositorias do github ##########
+
+Na pasta raíz do nosso projeto crie um arquivo chamado ".gitignore"
+
+Para auxiliar pode utilizar a ferramenta gitignore.io para consultar quais arquivos devem ser ignorados no seu projeto.
+
+Agora você pode iniciar o github através do git init
+
+Adicionar os arquivos pelo git add .
+
+comitar como comando git commit -m "Primeiro commit"
+
+Acessar o seu repositorio git : git remote add origin https://github.com/"Nome do usuário"/"Nome do repositorio".git
+
+e enviar para o github git push -u origin main
+
+-------------------------------------------------------------------------
+
+########## Criar um app (funcionalidade) no Django ##########
+
+Através do comando: python manage.py startapp galeria
+
+Esse app irá gerenciar nossas imagens da aplicação, agora precisamos vincula-la a aplicação:
+
+No arquivo settings da nossa plicação no campo "INSTALLED_APPS" vamos incluir o app "galeria".
+
+Agora no nosso app galeria vamos configurar ele para carregar a pagina no lugar do padrão do servidor django.
+
+no arquivo galeria\views.py vamos chamar um pacote para nos auxiliar a capturar respostas http
+
+from django.shortcuts import render
+from django.http import HttpResponse
+
+# Create your views here.
+
+def index(request):
+    return HttpResponse("Hello, world. You're at the polls index.")
+
+E no arquivo setup\urls.py vamos cadastrar uma nova rota para esse arquivo html.
+
+from django.contrib import admin
+from django.urls import path
+from galeria.views import index
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', index),
+]
+
+-------------------------------------------------------------------------
+
+########## Isolando urls dos apps no Django ##########
+
+Para auxiliar a criação e organização das rotas no django uma prática é isolar as urls por app.
+
+Criamos um arquivo na pasta raíz do nosso app chamado:
+
+galeria\urls.py, com a seguinte configuração:
+
+from django.urls import path
+from galeria.views import index
+
+urlpatterns = [
+    path('', index),
+]
+
+e adicionando o pacote include ao setup\urls.py da nossa aplicação conseguimos isolar as urls deixando a manutenção
+
+muito mais otimizada e simples.
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('galeria.urls')),
+]
+
+-------------------------------------------------------------------------
+
+########## Incluindo HTML dos apps no Django ##########
+
+Criamos uma pasta chamada "templates" no diretório raíz e com isso podemos incluir um arquivo index.html.
+
+Precisamos sinalizar para o 'settings' da aplicação o endereço desses arquivos.
+
+e alterar o arquivo galeria\views.py para que renderize nosso html.
+
+para organizar melhor vamos criar uma pasta em template para cada app.
+
+gerando um novo ajuste na view:
+
+def index(request):
+    return render(request, 'galeria/index.html')
+
+-------------------------------------------------------------------------
+
+########## Incluindo arquivos estáticos dos apps no Django ##########
+
+Para estilizar nossa aplicação devemos incluir os arquivos estáticos no projeto.
+
+para isso no arquivo settings vamos criar a configuração para a aplicação reconheceer os arquivos.
+
+STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'setup/static')
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+e rodamos alguns comandos para que o Django busque esses arquivos
+
+python manage.py collectstatic
+
+nos arquivos htlm inclua a tag {% load static %}
+
+E embede o código python ao arquivos ex: <link rel="stylesheet" href="{% static '/styles/style.css' %}">
+
+-------------------------------------------------------------------------
+
+########## Incluindo novas paginas html dos apps no Django ##########
+
+crie um novo arquivo HTML na pasta templates\galeria\imagem.html.
+
+após isso inclua uma nova função para carregar a página:
+
+def imagem(request):
+    return render(request, 'galeria/imagem.html')
+
+crie a nova rota no arquivo galeria\urls.py
+
+from django.urls import path
+from galeria.views import index, imagem
+
+urlpatterns = [
+    path('', index, name='index'),
+    path('imagem/', imagem, name='imagem'),
+]
+
+uma boa prática para para auxiliar a chamada da rota no html é dar um nome para a rota.
+
+e podemos embedar o python no html nos auxiliando com a nomenclatura ex:
+
+<a href="{% url 'imagem' %}">
+
+-------------------------------------------------------------------------
+
+########## uma boa prática é utilizar o DRY - Don't repeat yourself part I (HTML BASE) ##########
+
+Nosso projeto possui um html repetitivo, ou seja, muito código se repete.
+
+Para isso vamos criar uma base de html onde vamos reaproivetar em várias paginas.
+
+para isso criamos um arquivo chamado base.html 
+
+html
+{% block content %}{% endblock %}
+Html
+
+
+{% extends 'galeria/base.html' %}
+{% load static %}
+{% block content %}
+    Dados da página
+{% block content %}
+
+Como se fizessemos um sanduiche dos dados.
+
+-------------------------------------------------------------------------
+
+########## uma boa prática é utilizar o DRY - Don't repeat yourself partII (Componentes) ##########
+
+Criar uma pasta com o nome templates\galeria\partials dentro de galeria e criar os arquivo html dos componentes.
+
+e através do {% load static %} inclui-los dentro do nosso arquivo base para carregarmos em nossa página:
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alura Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/styles/style.css' %}">
+</head>
+
+<body>
+    {% include 'galeria/partials/_menu.html' %}
+    {% block content %}{% endblock %}
+    {% include 'galeria/partials/_footer.html' %}
+</body>
+
+</html>
+
+-------------------------------------------------------------------------
+
+########## uma boa prática é utilizar o DRY - Don't repeat yourself partII (Componentes) ##########
