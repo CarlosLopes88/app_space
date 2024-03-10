@@ -14,3 +14,31 @@ pip freeze > requirements.txt
 
 -------------------------------------------------------------------------
 
+Para cunstrução de tabelas no banco de dados via ORM do django.
+
+Você precisa incluir uma nova classe nos arquivos models e após finalizar utilizar o comando
+
+python manage.py makemigrations
+
+Após ele criar as intruções de criação da tabela você efetiva a operação com:
+
+python manage.py migrate
+
+-------------------------------------------------------------------------
+
+com a instrução abaixo podemos chamar o shell do próprio Django
+
+python manage.py shell
+
+from galeria.models import Fotografia - acessar nosso banco e inputar e salvar um registro
+
+foto = Fotografia(nome="Nebulosa de Carina", legenda="webbtelescope.org / NASA / James Webb", foto="carina-nebula.png")
+
+foto.save()
+
+-------------------------------------------------------------------------
+
+Para acessar o Django admin precisamos criar um super usuário
+
+python manage.py createsuperuser
+
