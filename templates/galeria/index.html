@@ -21,7 +21,7 @@
                         <ul class="cards__lista">
                             {% if cards %}
                             {% for fotografias in cards %}
-                            <li class="card">
+                            <li class="card__p">
                                 <a href="{% url 'imagem' fotografias.id %}">
                                 {% if fotografias.foto == "" or fotografias.foto == null %}    
                                 <img class="card__imagem" src="{% static '/assets/imagens/galeria/not-found.png'%}" alt="foto">
