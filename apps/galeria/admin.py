@@ -1,5 +1,5 @@
 from django.contrib import admin
-from galeria.models import Fotografias
+from apps.galeria.models import Fotografias
 
 # Register your models here.
 

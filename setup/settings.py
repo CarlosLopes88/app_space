@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'galeria', # Adicionando a aplicação criada
-    'users', # Adicionando a aplicação criada
+    'apps.galeria',
+    'apps.users',
 ]
 
 MIDDLEWARE = [
